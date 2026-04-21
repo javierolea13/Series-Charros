@@ -270,6 +270,18 @@ const CANAL_COLORS = {
   'En línea': '#00C777',
 };
 const SEMAFORO = { red:'#ef4444', yellow:'#f0d08a', green:'#00C777' };
+const DOW_ES = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+function dow(iso){
+  if(!iso) return '';
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  if(!m) return '';
+  const d = new Date(Date.UTC(+m[1], +m[2]-1, +m[3]));
+  return DOW_ES[d.getUTCDay()];
+}
+function fmtDate(iso){
+  const d = dow(iso);
+  return d ? `${d} · ${iso}` : (iso||'');
+}
 function trafficColor(val, allVals){
   const vals = allVals.filter(v=>v!=null && !isNaN(v));
   if (val==null || isNaN(val) || vals.length===0) return '#9fb0bf';
@@ -323,7 +335,7 @@ function renderSeriesCards(hostId, serieMap, kindLabel, anchorLabel) {
   const firstSlotKind = anchorLabel === 'Inaugural' ? 'inaugural' : 'segunda';
   const firstSlotKey  = anchorLabel === 'Inaugural' ? 'Inaugural' : 'J1';
   const firstSlot = (DATA.slot_matrix[firstSlotKind]||{})[firstSlotKey]||{};
-  const emisionVals = years.map(y=>firstSlot[y]?firstSlot[y].asistencia:null).filter(v=>v!=null);
+  const emisionPctVals = years.map(y=>firstSlot[y]?firstSlot[y].ocupacion:null).filter(v=>v!=null);
   let html = '';
   years.forEach(y=>{
     const s = serieMap[y];
@@ -332,7 +344,7 @@ function renderSeriesCards(hostId, serieMap, kindLabel, anchorLabel) {
     html += `<div class="panel" style="border-top:3px solid ${color}">
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
         <span class="small" style="color:${color};font-weight:700;letter-spacing:.5px">${y}</span>
-        <span class="small">${anchorLabel}: <b>${s.anchor}</b></span>
+        <span class="small">${anchorLabel}: <b>${fmtDate(s.anchor)}</b></span>
       </div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:8px">${s.rival}</div>
       <div class="small" style="color:var(--muted)">Ingreso (órdenes)</div>
@@ -362,7 +374,7 @@ function renderSeriesCards(hostId, serieMap, kindLabel, anchorLabel) {
         </div>
         <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:baseline">
           <span class="small">Emitidos / Aforo</span>
-          <b style="color:${trafficColor(d.asistencia, emisionVals)};font-size:15px">${fmtNum(d.asistencia)} / ${fmtNum(d.aforo)}</b>
+          <b style="color:${trafficColor(d.ocupacion, emisionPctVals)};font-size:15px">${fmtNum(d.asistencia)} / ${fmtNum(d.aforo)} · ${d.ocupacion.toFixed(1)}%</b>
         </div>
       </div>` : ''}
       <div style="margin-top:10px">${s.events.map(e=>`<div class="small">• ${e.evt} — ${fmtMXN(e.total)}</div>`).join('')}</div>
@@ -474,7 +486,7 @@ function renderSlot(hostId, slots, kindLabel) {
       ingreso: present.reduce((a,y)=>a+slotData[y].ingreso,0),
       boletos: present.reduce((a,y)=>a+slotData[y].boletos,0),
     };
-    const emisionVals = present.map(y=>slotData[y].asistencia);
+    const emisionPctVals = present.map(y=>slotData[y].ocupacion);
     html += `<div style="margin-bottom:26px">
       <h3 style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
         <span style="background:var(--bmo-green);color:#0b1418;padding:4px 10px;border-radius:6px;font-weight:700;font-size:12px">${slot === 'Inaugural' ? 'JUEGO INAUGURAL' : slot}</span>
@@ -514,7 +526,7 @@ function renderSlot(hostId, slots, kindLabel) {
           <div style="display:flex;justify-content:space-between"><span class="small">Promos</span><b>${fmtNum(d.promos)}</b></div>
           <div style="display:flex;justify-content:space-between"><span class="small">Bloqueos</span><b>${fmtNum(d.bloqueos)}</b></div>
           <div style="display:flex;justify-content:space-between;margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">
-            <span class="small">Emitidos / Aforo</span><b style="color:${trafficColor(d.asistencia, emisionVals)}">${fmtNum(d.asistencia)} / ${fmtNum(d.aforo)}</b>
+            <span class="small">Emitidos / Aforo</span><b style="color:${trafficColor(d.ocupacion, emisionPctVals)}">${fmtNum(d.asistencia)} / ${fmtNum(d.aforo)} · ${d.ocupacion.toFixed(1)}%</b>
           </div>
         </div>
       </div>`;
@@ -554,7 +566,7 @@ renderSlot('slot-segunda', DATA.slot_matrix.segunda, 'segunda');
     const linPct = (lin/e.total*100)||0;
     html += `<tr>
       <td><b>${evt}</b></td>
-      <td>${e.event_day}</td>
+      <td>${fmtDate(e.event_day)}</td>
       <td class="num">${fmtNum(e.items)}</td>
       <td class="num">${fmtMXN(taq)}<div class="small">${taqPct.toFixed(1)}% · ${fmtNum(e.taquilla.items)} bol.</div></td>
       <td class="num">${fmtMXN(lin)}<div class="small">${linPct.toFixed(1)}% · ${fmtNum(e.linea.items)} bol.</div></td>
@@ -602,7 +614,7 @@ renderSlot('slot-segunda', DATA.slot_matrix.segunda, 'segunda');
       <div class="kpi"><div class="lbl">Aforo total</div><div class="val">${fmtNum(totAforo)}</div></div>
       <div class="kpi"><div class="lbl">Ocupados</div><div class="val">${fmtNum(totOc)}</div><div class="delta">${fmtPct(pctOc)}</div></div>
       <div class="kpi"><div class="lbl">Disponibles</div><div class="val">${fmtNum(totDisp)}</div></div>
-      <div class="kpi"><div class="lbl">Fecha evento</div><div class="val" style="font-size:20px">${DATA.event_dates_2026[evt]||'—'}</div></div>
+      <div class="kpi"><div class="lbl">Fecha evento</div><div class="val" style="font-size:20px">${DATA.event_dates_2026[evt]?fmtDate(DATA.event_dates_2026[evt]):'—'}</div></div>
     </div>`;
     html += `<table><thead><tr>
       <th>Zona</th>
