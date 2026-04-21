@@ -145,6 +145,9 @@
   <!-- KPIs -->
   <section>
     <div class="kpis" id="kpis"></div>
+    <div class="small" style="color:var(--muted);margin-top:10px;padding:8px 12px;background:var(--panel2);border-radius:8px;border-left:3px solid var(--bmo-green)">
+      <b style="color:var(--text)">Nota:</b> los conteos etiquetados como <b>"órdenes"</b> cuentan transacciones de venta — cada orden puede incluir varios boletos. Los <b>boletos individuales</b> (por tipo: vendidos, abonos, paquetes, cortesías, promos, bloqueos) aparecen dentro del bloque <b>Emisión</b>.
+    </div>
   </section>
 
   <!-- SERIE 1 · Inaugural -->
@@ -318,12 +321,12 @@ function canalizar(rows) {
   el.innerHTML = `
     <div class="kpi"><div class="lbl">Ingreso Total 2026 (6 juegos)</div><div class="val">${fmtMXN(t26)}</div>
       <div class="delta ${d25>=0?'up':'down'}">${d25>=0?'+':''}${d25.toFixed(1)}% vs 2025 · ${d24>=0?'+':''}${d24.toFixed(1)}% vs 2024</div></div>
-    <div class="kpi"><div class="lbl">Boletos vendidos 2026</div><div class="val">${fmtNum(i26)}</div>
+    <div class="kpi"><div class="lbl">Órdenes 2026</div><div class="val">${fmtNum(i26)}</div>
       <div class="delta ${i26>=i25?'up':'down'}">vs ${fmtNum(i25)} (2025) · ${fmtNum(i24)} (2024)</div></div>
     <div class="kpi"><div class="lbl">Ingreso 2025 (cerrado)</div><div class="val">${fmtMXN(t25)}</div>
-      <div class="delta">${fmtNum(i25)} boletos · 6 juegos</div></div>
+      <div class="delta">${fmtNum(i25)} órdenes · 6 juegos</div></div>
     <div class="kpi"><div class="lbl">Ingreso 2024 (cerrado)</div><div class="val">${fmtMXN(t24)}</div>
-      <div class="delta">${fmtNum(i24)} boletos · 6 juegos</div></div>
+      <div class="delta">${fmtNum(i24)} órdenes · 6 juegos</div></div>
   `;
 })();
 
@@ -348,7 +351,7 @@ function renderSeriesCards(hostId, serieMap, kindLabel, anchorLabel) {
       <div style="font-size:13px;color:var(--muted);margin-bottom:8px">${s.rival}</div>
       <div class="small" style="color:var(--muted)">Ingreso (órdenes)</div>
       <div style="font-size:26px;font-weight:700">${fmtMXN(s.total)}</div>
-      <div class="small" style="margin-bottom:10px">${fmtNum(s.items)} boletos</div>
+      <div class="small" style="margin-bottom:10px" title="Cada orden puede contener varios boletos">${fmtNum(s.items)} órdenes</div>
       <div style="display:flex;gap:10px;margin-bottom:8px">
         <div style="flex:1">
           <div class="small">Taquilla</div>
@@ -511,7 +514,7 @@ function renderSlot(hostId, slots, kindLabel) {
         </div>
         <div class="small" style="color:var(--muted);margin-top:4px">${d.evt}</div>
         <div style="font-size:22px;font-weight:700;margin-top:8px">${fmtMXN(d.ingreso)}</div>
-        <div class="small">${fmtNum(d.boletos)} boletos (órdenes)</div>
+        <div class="small" title="Cada orden puede contener varios boletos">${fmtNum(d.boletos)} órdenes</div>
         <div style="display:flex;gap:8px;margin-top:10px;font-size:12px">
           <div style="flex:1"><div class="small">Taquilla</div><b>${fmtMXN(d.taq)}</b><div class="small" style="color:#ff8090">${taqPct.toFixed(0)}%</div></div>
           <div style="flex:1"><div class="small">En línea</div><b>${fmtMXN(d.lin)}</b><div class="small" style="color:#6ee2b0">${linPct.toFixed(0)}%</div></div>
@@ -550,7 +553,7 @@ renderSlot('slot-segunda', DATA.slot_matrix.segunda, 'segunda');
     'J3: Caliente de Durango vs Charros'
   ];
   let html = `<table><thead><tr>
-    <th>Evento</th><th>Fecha evento</th><th class="num">Boletos</th>
+    <th>Evento</th><th>Fecha evento</th><th class="num" title="Cada orden puede contener varios boletos">Órdenes</th>
     <th class="num">Taquilla</th><th class="num">En línea</th>
     <th class="num">Total</th>
   </tr></thead><tbody>`;
