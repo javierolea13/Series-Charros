@@ -269,6 +269,16 @@ const CANAL_COLORS = {
   'Taquilla': '#6F00FF',
   'En línea': '#00C777',
 };
+const SEMAFORO = { red:'#ef4444', yellow:'#f0d08a', green:'#00C777' };
+function trafficColor(val, allVals){
+  const vals = allVals.filter(v=>v!=null && !isNaN(v));
+  if (val==null || isNaN(val) || vals.length===0) return '#9fb0bf';
+  const min = Math.min(...vals), max = Math.max(...vals);
+  if (min === max) return SEMAFORO.green;
+  if (val === max) return SEMAFORO.green;
+  if (val === min) return SEMAFORO.red;
+  return SEMAFORO.yellow;
+}
 Chart.defaults.color = '#9fb0bf';
 Chart.defaults.borderColor = '#3a4754';
 // Reduce to 2-canal view: Taquilla vs En línea (todo lo que no es taquilla)
@@ -312,11 +322,12 @@ function renderSeriesCards(hostId, serieMap, kindLabel, anchorLabel) {
   const years = ['2024','2025','2026'].filter(y=>serieMap[y]);
   const firstSlotKind = anchorLabel === 'Inaugural' ? 'inaugural' : 'segunda';
   const firstSlotKey  = anchorLabel === 'Inaugural' ? 'Inaugural' : 'J1';
+  const firstSlot = (DATA.slot_matrix[firstSlotKind]||{})[firstSlotKey]||{};
+  const ocupVals = years.map(y=>firstSlot[y]?firstSlot[y].ocupacion:null).filter(v=>v!=null);
   let html = '';
   years.forEach(y=>{
     const s = serieMap[y];
     const color = COLORS[y];
-    const firstSlot = (DATA.slot_matrix[firstSlotKind]||{})[firstSlotKey]||{};
     const d = firstSlot[y] || null;
     html += `<div class="panel" style="border-top:3px solid ${color}">
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
@@ -351,13 +362,13 @@ function renderSeriesCards(hostId, serieMap, kindLabel, anchorLabel) {
         </div>
         <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:baseline">
           <span class="small">Asistencia / Aforo</span>
-          <b style="color:${color};font-size:15px">${fmtNum(d.asistencia)} / ${fmtNum(d.aforo)}</b>
+          <b style="color:${trafficColor(d.ocupacion, ocupVals)};font-size:15px">${fmtNum(d.asistencia)} / ${fmtNum(d.aforo)}</b>
         </div>
         <div style="margin-top:6px;display:flex;justify-content:space-between;align-items:center;gap:10px">
           <span class="small">Ocupación</span>
-          <b style="color:${d.ocupacion>=90?'var(--bmo-green)':(d.ocupacion>=70?'#f0d08a':'#f0a878')}">${d.ocupacion.toFixed(1)}%</b>
+          <b style="color:${trafficColor(d.ocupacion, ocupVals)}">${d.ocupacion.toFixed(1)}%</b>
         </div>
-        <div class="bar-wrap" style="margin-top:6px"><div class="bar" style="width:${Math.min(d.ocupacion,100)}%;background:linear-gradient(90deg, ${color}99, ${color})"></div></div>
+        <div class="bar-wrap" style="margin-top:6px"><div class="bar" style="width:${Math.min(d.ocupacion,100)}%;background:linear-gradient(90deg, ${trafficColor(d.ocupacion, ocupVals)}99, ${trafficColor(d.ocupacion, ocupVals)})"></div></div>
       </div>` : ''}
       <div style="margin-top:10px">${s.events.map(e=>`<div class="small">• ${e.evt} — ${fmtMXN(e.total)}</div>`).join('')}</div>
     </div>`;
@@ -468,6 +479,7 @@ function renderSlot(hostId, slots, kindLabel) {
       ingreso: present.reduce((a,y)=>a+slotData[y].ingreso,0),
       boletos: present.reduce((a,y)=>a+slotData[y].boletos,0),
     };
+    const ocupVals = present.map(y=>slotData[y].ocupacion);
     html += `<div style="margin-bottom:26px">
       <h3 style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
         <span style="background:var(--bmo-green);color:#0b1418;padding:4px 10px;border-radius:6px;font-weight:700;font-size:12px">${slot === 'Inaugural' ? 'JUEGO INAUGURAL' : slot}</span>
@@ -508,10 +520,10 @@ function renderSlot(hostId, slots, kindLabel) {
           <div style="display:flex;justify-content:space-between"><span class="small">Promos</span><b>${fmtNum(d.promos)}</b></div>
           <div style="display:flex;justify-content:space-between"><span class="small">Bloqueos</span><b>${fmtNum(d.bloqueos)}</b></div>
           <div style="display:flex;justify-content:space-between;margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">
-            <span class="small">Asistencia total</span><b style="color:${COLORS[y]}">${fmtNum(d.asistencia)} / ${fmtNum(d.aforo)}</b>
+            <span class="small">Asistencia total</span><b style="color:${trafficColor(d.ocupacion, ocupVals)}">${fmtNum(d.asistencia)} / ${fmtNum(d.aforo)}</b>
           </div>
           <div style="display:flex;justify-content:space-between;margin-top:4px">
-            <span class="small">Ocupación</span><b style="color:${d.ocupacion>=90?'var(--bmo-green)':'#f0d08a'}">${d.ocupacion.toFixed(1)}%</b>
+            <span class="small">Ocupación</span><b style="color:${trafficColor(d.ocupacion, ocupVals)}">${d.ocupacion.toFixed(1)}%</b>
           </div>
         </div>
       </div>`;
