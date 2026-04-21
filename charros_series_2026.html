@@ -322,7 +322,7 @@ function renderSeriesCards(hostId, serieMap, kindLabel, anchorLabel) {
   const firstSlotKind = anchorLabel === 'Inaugural' ? 'inaugural' : 'segunda';
   const firstSlotKey  = anchorLabel === 'Inaugural' ? 'Inaugural' : 'J1';
   const firstSlot = (DATA.slot_matrix[firstSlotKind]||{})[firstSlotKey]||{};
-  const ocupVals = years.map(y=>firstSlot[y]?firstSlot[y].ocupacion:null).filter(v=>v!=null);
+  const emisionVals = years.map(y=>firstSlot[y]?firstSlot[y].asistencia:null).filter(v=>v!=null);
   let html = '';
   years.forEach(y=>{
     const s = serieMap[y];
@@ -350,7 +350,7 @@ function renderSeriesCards(hostId, serieMap, kindLabel, anchorLabel) {
         </div>
       </div>
       ${d ? `<div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--border)">
-        <div class="small" style="color:var(--muted);margin-bottom:6px">Asistencia ${anchorLabel === 'Inaugural' ? 'Juego Inaugural' : 'J1'} · ocupación real</div>
+        <div class="small" style="color:var(--muted);margin-bottom:6px">Emisión ${anchorLabel === 'Inaugural' ? 'Juego Inaugural' : 'J1'}</div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-size:12px">
           <div><div class="small">Vendidos</div><b>${fmtNum(d.vendidos_disp)}</b></div>
           <div><div class="small">Abonos</div><b>${fmtNum(d.abonos)}</b></div>
@@ -360,14 +360,9 @@ function renderSeriesCards(hostId, serieMap, kindLabel, anchorLabel) {
           <div><div class="small">Bloqueos</div><b>${fmtNum(d.bloqueos)}</b></div>
         </div>
         <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:baseline">
-          <span class="small">Asistencia / Aforo</span>
-          <b style="color:${trafficColor(d.ocupacion, ocupVals)};font-size:15px">${fmtNum(d.asistencia)} / ${fmtNum(d.aforo)}</b>
+          <span class="small">Emitidos / Aforo</span>
+          <b style="color:${trafficColor(d.asistencia, emisionVals)};font-size:15px">${fmtNum(d.asistencia)} / ${fmtNum(d.aforo)}</b>
         </div>
-        <div style="margin-top:6px;display:flex;justify-content:space-between;align-items:center;gap:10px">
-          <span class="small">Ocupación</span>
-          <b style="color:${trafficColor(d.ocupacion, ocupVals)}">${d.ocupacion.toFixed(1)}%</b>
-        </div>
-        <div class="bar-wrap" style="margin-top:6px"><div class="bar" style="width:${Math.min(d.ocupacion,100)}%;background:linear-gradient(90deg, ${trafficColor(d.ocupacion, ocupVals)}99, ${trafficColor(d.ocupacion, ocupVals)})"></div></div>
       </div>` : ''}
       <div style="margin-top:10px">${s.events.map(e=>`<div class="small">• ${e.evt} — ${fmtMXN(e.total)}</div>`).join('')}</div>
     </div>`;
@@ -478,7 +473,7 @@ function renderSlot(hostId, slots, kindLabel) {
       ingreso: present.reduce((a,y)=>a+slotData[y].ingreso,0),
       boletos: present.reduce((a,y)=>a+slotData[y].boletos,0),
     };
-    const ocupVals = present.map(y=>slotData[y].ocupacion);
+    const emisionVals = present.map(y=>slotData[y].asistencia);
     html += `<div style="margin-bottom:26px">
       <h3 style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
         <span style="background:var(--bmo-green);color:#0b1418;padding:4px 10px;border-radius:6px;font-weight:700;font-size:12px">${slot === 'Inaugural' ? 'JUEGO INAUGURAL' : slot}</span>
@@ -509,9 +504,8 @@ function renderSlot(hostId, slots, kindLabel) {
           <div style="flex:1"><div class="small">Taquilla</div><b>${fmtMXN(d.taq)}</b><div class="small" style="color:#ff8090">${taqPct.toFixed(0)}%</div></div>
           <div style="flex:1"><div class="small">En línea</div><b>${fmtMXN(d.lin)}</b><div class="small" style="color:#6ee2b0">${linPct.toFixed(0)}%</div></div>
         </div>
-        <div class="bar-wrap" style="margin-top:4px"><div class="bar" style="width:${taqPct}%;background:linear-gradient(90deg, ${COLORS[y]}99, ${COLORS[y]})"></div></div>
         <div style="margin-top:12px;padding-top:10px;border-top:1px dashed var(--border)">
-          <div class="small" style="color:var(--muted);margin-bottom:4px">Asistencia real</div>
+          <div class="small" style="color:var(--muted);margin-bottom:4px">Emisión</div>
           <div style="display:flex;justify-content:space-between"><span class="small">Vendidos</span><b>${fmtNum(d.vendidos_disp)}</b></div>
           <div style="display:flex;justify-content:space-between"><span class="small">Abonos</span><b>${fmtNum(d.abonos)}</b></div>
           <div style="display:flex;justify-content:space-between"><span class="small">Paquetes</span><b>${fmtNum(d.paquetes)}</b></div>
@@ -519,10 +513,7 @@ function renderSlot(hostId, slots, kindLabel) {
           <div style="display:flex;justify-content:space-between"><span class="small">Promos</span><b>${fmtNum(d.promos)}</b></div>
           <div style="display:flex;justify-content:space-between"><span class="small">Bloqueos</span><b>${fmtNum(d.bloqueos)}</b></div>
           <div style="display:flex;justify-content:space-between;margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">
-            <span class="small">Asistencia total</span><b style="color:${trafficColor(d.ocupacion, ocupVals)}">${fmtNum(d.asistencia)} / ${fmtNum(d.aforo)}</b>
-          </div>
-          <div style="display:flex;justify-content:space-between;margin-top:4px">
-            <span class="small">Ocupación</span><b style="color:${trafficColor(d.ocupacion, ocupVals)}">${d.ocupacion.toFixed(1)}%</b>
+            <span class="small">Emitidos / Aforo</span><b style="color:${trafficColor(d.asistencia, emisionVals)}">${fmtNum(d.asistencia)} / ${fmtNum(d.aforo)}</b>
           </div>
         </div>
       </div>`;
