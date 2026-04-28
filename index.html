@@ -453,21 +453,7 @@ function renderSeriesCards(hostId, serieMap, kindLabel, anchorLabel, opts) {
           <div class="small" style="color:#6ee2b0">${s.lin_pct.toFixed(1)}% · ${fmtNum(s.lin_items)} bol.</div>
         </div>
       </div>
-      ${d ? `<div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--border)">
-        <div class="small" style="color:var(--muted);margin-bottom:6px">Emisión ${anchorLabel === 'Inaugural' ? 'Juego Inaugural' : 'J1'}</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-size:12px">
-          <div><div class="small">Vendidos</div><b>${fmtNum(d.vendidos_disp)}</b></div>
-          <div><div class="small">Abonos</div><b>${fmtNum(d.abonos)}</b></div>
-          <div><div class="small">Paquetes</div><b>${fmtNum(d.paquetes)}</b></div>
-          <div><div class="small">Cortesías</div><b>${fmtNum(d.cortesias)}</b></div>
-          <div><div class="small">Promos</div><b>${fmtNum(d.promos)}</b></div>
-          <div><div class="small">Bloqueos</div><b>${fmtNum(d.bloqueos)}</b></div>
-        </div>
-        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:baseline">
-          <span class="small">Emitidos / Aforo</span>
-          <b style="color:${trafficColor(d.ocupacion, emisionPctVals)};font-size:15px">${fmtNum(d.asistencia)} / ${fmtNum(d.aforo)} · ${d.ocupacion.toFixed(1)}%</b>
-        </div>
-      </div>` : ''}
+      ${''}
       <div style="margin-top:10px">${s.events.map(e=>`<div class="small">• ${e.evt} — ${fmtMXN(e.total)}</div>`).join('')}</div>
     </div>`;
   });
@@ -563,15 +549,15 @@ function renderSeriesCanal(canvasId, tableId, serieMap, opts) {
 
 renderSeriesCards('s1-cards', DATA.serie1, 'Serie Inaugural', 'Inaugural');
 renderSeriesCards('s2-cards', DATA.serie2, 'Serie J1-J3', 'J1');
-renderSeriesCards('s3-cards', DATA.serie3, 'Serie 3', 'J1', { slotKind:'s3', slotKey:'J1', years:['2025','2026'] });
-renderSeriesCards('s4-cards', DATA.serie4, 'Serie 4', 'J1', { slotKind:'s4', slotKey:'J1', years:['2025','2026'] });
+renderSeriesCards('s3-cards', DATA.serie3, 'Serie 3', 'J1', { slotKind:'s3', slotKey:'J1', years:['2024','2025','2026'] });
+renderSeriesCards('s4-cards', DATA.serie4, 'Serie 4', 'J1', { slotKind:'s4', slotKey:'J1', years:['2024','2025','2026'] });
 renderSeriesTimeline('chart-s2-timeline', DATA.serie2);
-renderSeriesTimeline('chart-s3-timeline', DATA.serie3, { years:['2025','2026'] });
-renderSeriesTimeline('chart-s4-timeline', DATA.serie4, { years:['2025','2026'] });
+renderSeriesTimeline('chart-s3-timeline', DATA.serie3, { years:['2024','2025','2026'] });
+renderSeriesTimeline('chart-s4-timeline', DATA.serie4, { years:['2024','2025','2026'] });
 renderSeriesCanal('chart-s1-canal', 's1-canal-table', DATA.serie1);
 renderSeriesCanal('chart-s2-canal', 's2-canal-table', DATA.serie2);
-renderSeriesCanal('chart-s3-canal', 's3-canal-table', DATA.serie3, { years:['2025','2026'] });
-renderSeriesCanal('chart-s4-canal', 's4-canal-table', DATA.serie4, { years:['2025','2026'] });
+renderSeriesCanal('chart-s3-canal', 's3-canal-table', DATA.serie3, { years:['2024','2025','2026'] });
+renderSeriesCanal('chart-s4-canal', 's4-canal-table', DATA.serie4, { years:['2024','2025','2026'] });
 
 // ---- Slot matrix (event-vs-event comparison across years)
 function renderSlot(hostId, slots, kindLabel, opts) {
@@ -639,8 +625,8 @@ function renderSlot(hostId, slots, kindLabel, opts) {
 }
 renderSlot('slot-inaugural', DATA.slot_matrix.inaugural, 'inaugural');
 renderSlot('slot-segunda', DATA.slot_matrix.segunda, 'segunda');
-renderSlot('slot-s3', DATA.slot_matrix.s3, 's3', { years:['2025','2026'], slotOrder:['J1','J2','J3'] });
-renderSlot('slot-s4', DATA.slot_matrix.s4, 's4', { years:['2025','2026'], slotOrder:['J1','J2','J3'] });
+renderSlot('slot-s3', DATA.slot_matrix.s3, 's3', { years:['2024','2025','2026'], slotOrder:['J1','J2','J3'] });
+renderSlot('slot-s4', DATA.slot_matrix.s4, 's4', { years:['2024','2025','2026'], slotOrder:['J1','J2','J3'] });
 
 // ---- Attendance per event 2026 (per-series)
 function buildAttTabs(tabsId, paneId, evtList){
